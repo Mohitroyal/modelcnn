@@ -6,7 +6,7 @@ from PIL import Image
 import cv2
 
 # Load ONNX model
-session = ort.InferenceSession("cnn.onnx")
+session = ort.InferenceSession("cnn.h5")
 input_name = session.get_inputs()[0].name
 output_name = session.get_outputs()[0].name
 
