@@ -5,15 +5,10 @@ import os
 import requests
 from tensorflow.keras.models import load_model
 
-# Hugging Face model download URL
-MODEL_URL = "https://huggingface.co/mohit12365/cnn-model/resolve/main/cnn.h5"
+# Load model
+model = load_model("cnn.h5")
 
-# Download model if not already present
-if not os.path.exists("cnn.h5"):
-    with st.spinner("Downloading model from Hugging Face..."):
-        response = requests.get(MODEL_URL)
-        with open("cnn.h5", "wb") as f:
-            f.write(response.content)
+
 
 # Load the model
 model = load_model("cnn.h5")
