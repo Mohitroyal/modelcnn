@@ -1,17 +1,30 @@
-# app.py
 import streamlit as st
 import numpy as np
-from tensorflow.keras.models import load_model
 from PIL import Image
+import os
+import requests
+from tensorflow.keras.models import load_model
 
-# Load the Keras model
+# Hugging Face model download URL
+MODEL_URL = "https://huggingface.co/mohit12365/cnn-model/resolve/main/cnn.h5"
+
+# Download model if not already present
+if not os.path.exists("cnn.h5"):
+    with st.spinner("Downloading model from Hugging Face..."):
+        response = requests.get(MODEL_URL)
+        with open("cnn.h5", "wb") as f:
+            f.write(response.content)
+
+# Load the model
 model = load_model("cnn.h5")
 
+# Class labels
 classes = ["airplane", "automobile", "bird", "cat", "deer",
            "dog", "frog", "horse", "ship", "truck"]
 
-st.title("CIFAR-10 Image Classifier (Keras)")
-uploaded_file = st.file_uploader("Upload an image (32x32)", type=["jpg", "png"])
+# Streamlit UI
+st.title("CIFAR-10 Image Classifier")
+uploaded_file = st.file_uploader("Upload a 32x32 image", type=["jpg", "png"])
 
 if uploaded_file is not None:
     image = Image.open(uploaded_file).resize((32, 32))
@@ -22,8 +35,7 @@ if uploaded_file is not None:
         img_array = img_array[:, :, :3]
 
     img_array = img_array / 255.0
-    img_array = np.expand_dims(img_array, axis=0)
-    img_array = img_array.astype(np.float32)
+    img_array = np.expand_dims(img_array, axis=0).astype(np.float32)
 
     prediction = model.predict(img_array)
     class_index = np.argmax(prediction)
