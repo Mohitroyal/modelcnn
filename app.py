@@ -1,36 +1,33 @@
 # app.py
 import streamlit as st
 import numpy as np
-import onnxruntime as ort
+from tensorflow.keras.models import load_model
 from PIL import Image
-import cv2
 
-# Load ONNX model
-session = ort.InferenceSession("cnn.h5")
-input_name = session.get_inputs()[0].name
-output_name = session.get_outputs()[0].name
+# Load the Keras model
+model = load_model("cnn.h5")
 
 classes = ["airplane", "automobile", "bird", "cat", "deer",
            "dog", "frog", "horse", "ship", "truck"]
 
-st.title("CIFAR-10 Image Classifier")
+st.title("CIFAR-10 Image Classifier (Keras)")
 uploaded_file = st.file_uploader("Upload an image (32x32)", type=["jpg", "png"])
 
 if uploaded_file is not None:
-    # Display image
     image = Image.open(uploaded_file).resize((32, 32))
     st.image(image, caption="Uploaded Image", use_column_width=True)
 
-    # Preprocess image
     img_array = np.array(image)
     if img_array.shape[-1] == 4:
-        img_array = img_array[:, :, :3]  # Remove alpha channel if exists
+        img_array = img_array[:, :, :3]
 
-    img_array = img_array / 255.0  # Normalize
-    img_array = np.expand_dims(img_array, axis=0)  # Add batch dimension
-    img_array = img_array.astype(np.float32)  # Ensure float32
+    img_array = img_array / 255.0
+    img_array = np.expand_dims(img_array, axis=0)
+    img_array = img_array.astype(np.float32)
 
-    # Predict using ONNX Runtime
-    prediction = session.run([output_name], {input_name: img_array})[0]
+    prediction = model.predict(img_array)
     class_index = np.argmax(prediction)
+    confidence = float(np.max(prediction))
+
     st.write("Prediction:", classes[class_index])
+    st.write("Confidence:", f"{confidence:.2%}")
