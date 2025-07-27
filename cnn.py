@@ -52,7 +52,7 @@ cnn = keras.Sequential([
 ])
 cnn.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 cnn.fit(X_train_scaled, y_train_categorical, epochs=10)
-cnn.save_weights("cnn_weights.h5")
+cnn.save_weights("cnn.h5")
 
 
 # Evaluate
